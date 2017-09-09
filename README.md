@@ -2,7 +2,25 @@
 Self-Driving Car Engineer Nanodegree Program
 
 ---
+## Project Writeup
 
+* Model
+  * Motion model equations as described in the lessons were used. We use a Kinematic Model (and not Dynamic Model) due to its simplicity.
+  * In the model, we account for the vehicle position (x, y), heading angle (psi), velocity (v). In addition, we also account for the cross-track error (cte) and orientation error (epsi). The length of the vehicle from the front to the center of gravity (Lf) is also used.
+  * It is important to note that velocity is used to update heading angle.
+* N was chosen as 15 and dt as 0.1. This allowed us to look 1.5 seconds ahead. A larger N resulted in more computation. A larger dt resulted in discretization error.
+* Vehicle co-ordinate system was converted to Simulator co-ordinate system by a translation and rotation co-ordinate shift.
+* Tuning for Reference State
+  * cte and epsi errors were given large weights of 1000 since following the reference was the highest priority.
+  * velocity was not given additional weight.
+* Tuning for Actuators
+  * steering angle and acceleration were given moderate weights.
+* Tuning between sequential Actuations
+  * Rate of change of steering angle was given higher weight in order to dampen the effect of sudden turning.
+  * Rate of change of acceleration was given moderate weight.
+* Latency (delay)
+  * 100ms latency was accounted for. The original state was predicted (using the motion model prediction equations) to a state 100ms ahead before sending it to the MPC Controller.
+  
 ## Dependencies
 
 * cmake >= 3.5
