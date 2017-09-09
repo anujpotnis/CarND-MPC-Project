@@ -126,10 +126,60 @@ int main() {
                     double steer_value = j[1]["steering_angle"];
                     double throttle_value = j[1]["throttle"];
                     
+                    double Lf = 2.67;
+                    
                     Eigen::VectorXd state(6);
                     state << 0,0,0,v,cte,epsi;
                     
-                    auto vars = mpc.Solve(state, coeffs);
+                    
+                    // Add delay of 100ms
+                    
+                    double delay = 0.1;
+                    
+                    /*
+                    double x = state[0];
+                    double y = state[1];
+                    double psi = state[2];
+                    double v = state[3];
+                    double cte = state[4];
+                    double epsi = state[5];
+                     */
+                    
+                    // Here's `x` to get you started.
+                    // The idea here is to constraint this value to be 0.
+                    //
+                    // Recall the equations for the model:
+                    // x_[t] = x[t-1] + v[t-1] * cos(psi[t-1]) * dt
+                    // y_[t] = y[t-1] + v[t-1] * sin(psi[t-1]) * dt
+                    // psi_[t] = psi[t-1] + v[t-1] / Lf * delta[t-1] * dt
+                    // v_[t] = v[t-1] + a[t-1] * dt
+                    // cte[t] = f(x[t-1]) - y[t-1] + v[t-1] * sin(epsi[t-1]) * dt
+                    // epsi[t] = psi[t] - psides[t-1] + v[t-1] * delta[t-1] / Lf * dt
+                   
+                    Eigen::VectorXd state_delayed(6);
+
+                    // fg[1 + x_start + t] = x1 - (x0 + v0 * CppAD::cos(psi0) * dt);
+                    state_delayed[0] = state[0] + state[3] * cos(state[2]) * delay;
+
+                    //fg[1 + y_start + t] = y1 - (y0 + v0 * CppAD::sin(psi0) * dt);
+                    state_delayed[1] = state[1] + state[3] * sin(state[2]) * delay;
+
+                    // fg[1 + psi_start + t] = psi1 - (psi0 + v0 * delta0 / Lf * dt);
+                    state_delayed[2] = state[2] - state[3]/Lf * steer_value * delay;
+                    
+                    // fg[1 + v_start + t] = v1 - (v0 + a0 * dt);
+                    state_delayed[3] = state[3] + throttle_value * delay;
+                    
+                    // fg[1 + cte_start + t] =
+                    //cte1 - ((f0 - y0) + (v0 * CppAD::sin(epsi0) * dt));
+                    state_delayed[4] = state[4] + state[3] * sin(state[5]) * delay;
+                    
+                    //fg[1 + epsi_start + t] =
+                    //epsi1 - ((psi0 - psides0) + v0 * delta0 / Lf * dt);
+                    
+                    state_delayed[5] = state[5] + state[3]/Lf * steer_value * delay;
+                    
+                    auto vars = mpc.Solve(state_delayed, coeffs);
                     
                     
                     //Display the waypoints/reference line
@@ -158,7 +208,7 @@ int main() {
                         }
                     }
                     
-                    double Lf = 2.67;
+                    
                     std::cout << "result" << std::endl;
                     
                     json msgJson;
