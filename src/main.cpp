@@ -93,6 +93,7 @@ int main() {
                     double psi = j[1]["psi"];
                     double v = j[1]["speed"];
                     
+                    v = 0.4407*v;
                     /*
                      * TODO: Calculate steering angle and throttle using MPC.
                      *
@@ -166,7 +167,7 @@ int main() {
                     //fg[1 + epsi_start + t] =
                     //epsi1 - ((psi0 - psides0) + v0 * delta0 / Lf * dt);
                     
-                    state_delayed[5] = state[5] + state[3]/Lf * steer_value * delay;
+                    state_delayed[5] = state[5] - state[3]/Lf * steer_value * delay;
                     
                     auto vars = mpc.Solve(state_delayed, coeffs);
                     
@@ -203,7 +204,7 @@ int main() {
                     json msgJson;
                     // NOTE: Remember to divide by deg2rad(25) before you send the steering value back.
                     // Otherwise the values will be in between [-deg2rad(25), deg2rad(25] instead of [-1, 1].
-                    msgJson["steering_angle"] = -vars[0]/(deg2rad(25)*Lf);
+                    msgJson["steering_angle"] = -vars[0]/deg2rad(25);
                     msgJson["throttle"] = vars[1];
                     
                     std::cout << "angle : " << vars[0] << std::endl;
