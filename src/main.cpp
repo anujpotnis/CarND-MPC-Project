@@ -137,33 +137,22 @@ int main() {
                     double delay = 0.1;
                     
                     /*
-                    double x = state[0];
-                    double y = state[1];
-                    double psi = state[2];
-                    double v = state[3];
-                    double cte = state[4];
-                    double epsi = state[5];
+                     double x = state[0];
+                     double y = state[1];
+                     double psi = state[2];
+                     double v = state[3];
+                     double cte = state[4];
+                     double epsi = state[5];
                      */
                     
-                    // Here's `x` to get you started.
-                    // The idea here is to constraint this value to be 0.
-                    //
-                    // Recall the equations for the model:
-                    // x_[t] = x[t-1] + v[t-1] * cos(psi[t-1]) * dt
-                    // y_[t] = y[t-1] + v[t-1] * sin(psi[t-1]) * dt
-                    // psi_[t] = psi[t-1] + v[t-1] / Lf * delta[t-1] * dt
-                    // v_[t] = v[t-1] + a[t-1] * dt
-                    // cte[t] = f(x[t-1]) - y[t-1] + v[t-1] * sin(epsi[t-1]) * dt
-                    // epsi[t] = psi[t] - psides[t-1] + v[t-1] * delta[t-1] / Lf * dt
-                   
                     Eigen::VectorXd state_delayed(6);
-
+                    
                     // fg[1 + x_start + t] = x1 - (x0 + v0 * CppAD::cos(psi0) * dt);
                     state_delayed[0] = state[0] + state[3] * cos(state[2]) * delay;
-
+                    
                     //fg[1 + y_start + t] = y1 - (y0 + v0 * CppAD::sin(psi0) * dt);
                     state_delayed[1] = state[1] + state[3] * sin(state[2]) * delay;
-
+                    
                     // fg[1 + psi_start + t] = psi1 - (psi0 + v0 * delta0 / Lf * dt);
                     state_delayed[2] = state[2] - state[3]/Lf * steer_value * delay;
                     
