@@ -23,7 +23,7 @@ const double Lf = 2.67;
 
 double ref_cte = 0;
 double ref_epsi = 0;
-double ref_v = 10;
+double ref_v = 20;
 
 size_t x_start = 0;
 size_t y_start = x_start + N;
@@ -99,7 +99,7 @@ class FG_eval {
             AD<double> delta0 = vars[delta_start + t - 1];
             AD<double> a0 = vars[a_start + t - 1];
             
-            AD<double> f0 = coeffs[0] + coeffs[1] * x0;
+            AD<double> f0 = coeffs[0] + coeffs[1] * x0 + coeffs[2] * x0 * x0 + coeffs[3] * x0 * x0 * x0;
             AD<double> psides0 = CppAD::atan(3*coeffs[3] * x0 * x0 + 2*coeffs[2] * x0 + coeffs[1] );
             
             // Here's `x` to get you started.
